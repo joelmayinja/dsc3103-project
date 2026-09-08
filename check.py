@@ -1,7 +1,7 @@
 #%%
 import pandas as pd
 
-from scr.validate.rules import rule_positive_price, rule_duplicate_ids,rule_duplicate_rows,rule_valid_date_format,rule_missing_markets,rule_known_commodities
+from src.validate.rules import rule_positive_price, rule_duplicate_ids,rule_duplicate_rows,rule_valid_date,rule_missing_market,rule_known_commodity
 # %%
 df = pd.read_csv("data/raw/prices.csv")
 
@@ -10,9 +10,9 @@ negative_prices = rule_positive_price(df)
 
 duplicate_ids = rule_duplicate_ids(df)
 duplicate_rows = rule_duplicate_rows(df)
-invalid_dates = rule_valid_date_format(df)
-missing_markets = rule_missing_markets(df)
-unknown_commodities = rule_known_commodities(df, ["Commodity1", "Commodity2"])  # Replace with actual known commodities
+invalid_dates = rule_valid_date(df)
+missing_market = rule_missing_market(df)
+unknown_commodity = rule_known_commodity(df, ["maize", "beans"])
 
 
 
@@ -29,7 +29,7 @@ print("---- Invalid Dates ----")
 print(invalid_dates)
 
 print("---- Missing Markets ----")
-print(missing_markets)
+print(missing_market)
 
 print("---- Unknown Commodities ----")
-print(unknown_commodities)
+print(unknown_commodity)
