@@ -1,82 +1,94 @@
-#%%
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 import pandas as pd
 
-import matplotlib.pyplot as plt
-
-#%%
-## here we import the rules from the rules.py file but can run from the terminal since its vs code
-from src.validate import rules 
-
+from src.validate import rules
 
 raw_path = "data/raw/prices.csv"
 
-## this is the main function that will run the rules on the data
+
 def inferred_schema(df):
-    print("\n---- Inferred Schema ----")
-    print("----------------------------")
-    print(df.dtypes)
+    return df.dtypes.astype(str).to_dict()
+
 
 def row_count(df):
-         print("\n---- Row Count ----")
-         print("----------------------------")
-         print(len(df))
-
-## this function will run the rules on the data frame and print the number of negative values
-def negative_values(df):
-     negative_values = rules.rule_positive_price(df)
-     print("\n---- Negative Values ----")
-     print("----------------------------")
-     print(len(negative_values))
-
-def duplicate_ids(df):
-     duplicate_ids = rules.rule_duplicate_ids(df)
-     print("\n---- Duplicate IDs ----")
-     print("----------------------------")
-     print(len(duplicate_ids))
+    return len(df)
 
 
-def price_histogram(df):
+def count_missing_values(df):
+    return df.isna().sum().to_dict()
+
+
+def duplicate_counts(df):
+    return {
+        "exact_row_duplicates": int(df.duplicated().sum()),
+        "duplicate_record_ids": int(rules.rule_duplicate_ids(df).shape[0]),
+    }
+
+
+def invalid_value_summary(df):
+    return {
+        "negative_or_zero_prices": int(rules.rule_positive_price(df).shape[0]),
+        "invalid_dates": int(rules.rule_valid_date(df).shape[0]),
+        "missing_markets": int(rules.rule_missing_market(df).shape[0]),
+        "unknown_commodities": int(rules.rule_known_commodity(df, ["maize", "beans"]).shape[0]),
+    }
+
+
+def numeric_summary(df):
+    return df.select_dtypes(include="number").describe().transpose().to_dict()
+
+
+def price_histogram(df, output_path="docs/price_histogram.png"):
     plt.figure(figsize=(8, 5))
-    plt.hist(df["price"].dropna(), bins=10, edgecolor="black")
-    plt.title("Distribution of Commodity Prices")
+    plt.hist(df["price"].dropna(), bins=12, edgecolor="black")
+    plt.title("Price Distribution")
     plt.xlabel("Price")
     plt.ylabel("Frequency")
     plt.tight_layout()
-    plt.savefig("docs/price_histogram.png")
-    plt.show()
+    plt.savefig(output_path)
+    plt.close()
+    return output_path
 
 
-
- # Validation rules
-    print("\nValidation failures:")
-    print("Invalid prices:", len(rules.rule_positive_price(df)))
-    print("Duplicate IDs:", len(rules.rule_duplicate_ids(df)))
-    print("Duplicate rows:", len(rules.rule_duplicate_rows(df)))
-    print("Invalid dates:", len(rules.rule_valid_date(df)))
-    print("Missing markets:", len(rules.rule_missing_market(df)))
-    print("Unknown commodities:", len(rules.rule_known_commodity(df)))
-
- 
-
-
-
-## This functions from the raw path. but it runs the rules on the data frame and prints them
-def run_files(path = raw_path):
-    ## reads the data frame from the path
+def run_profiler(path=raw_path):
     df = pd.read_csv(path)
-    inferred_schema(df)
-    row_count(df)
-    negative_values(df)
-    duplicate_ids(df)
-    price_histogram(df)
+    report = {
+        "schema": inferred_schema(df),
+        "row_count": row_count(df),
+        "missing_values": count_missing_values(df),
+        "duplicates": duplicate_counts(df),
+        "invalid_values": invalid_value_summary(df),
+        "numeric_summary": numeric_summary(df),
+        "histogram_path": price_histogram(df),
+    }
 
-## to run the fuction from the dataframe
+    print("\n---- Inferred Schema ----")
+    print(report["schema"])
+    print("\n---- Row Count ----")
+    print(report["row_count"])
+    print("\n---- Missing Values ----")
+    print(report["missing_values"])
+    print("\n---- Duplicate Counts ----")
+    print(report["duplicates"])
+    print("\n---- Invalid Values ----")
+    print(report["invalid_values"])
+    print("\n---- Numeric Summary ----")
+    for key, value in report["numeric_summary"].items():
+        print(key, value)
+    print(f"\nHistogram saved to: {report['histogram_path']}")
+    return report
+
+
 if __name__ == "__main__":
-    run_files("data/raw/prices.csv")
-
-
-## to call and check if it works you say python src/validate/profile and it will print the schema of the data frame
-
-
+    run_profiler("data/raw/prices.csv")
 
    
