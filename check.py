@@ -1,35 +1,29 @@
-#%%
 import pandas as pd
 
-from src.validate.rules import rule_positive_price, rule_duplicate_ids,rule_duplicate_rows,rule_valid_date,rule_missing_market,rule_known_commodity
-# %%
+from src.validate.rules import (
+    rule_duplicate_ids,
+    rule_duplicate_rows,
+    rule_known_commodity,
+    rule_missing_market,
+    rule_positive_price,
+    rule_valid_date,
+)
+
+
 df = pd.read_csv("data/raw/prices.csv")
 
-#call the rules
-negative_prices = rule_positive_price(df)
+rules = [
+    ("Negative Prices", rule_positive_price),
+    ("Duplicate IDs", rule_duplicate_ids),
+    ("Duplicate Rows", rule_duplicate_rows),
+    ("Invalid Dates", rule_valid_date),
+    ("Missing Markets", rule_missing_market),
+    ("Unknown Commodities", lambda frame: rule_known_commodity(frame, ["maize", "beans"])),
+]
 
-duplicate_ids = rule_duplicate_ids(df)
-duplicate_rows = rule_duplicate_rows(df)
-invalid_dates = rule_valid_date(df)
-missing_market = rule_missing_market(df)
-unknown_commodity = rule_known_commodity(df, ["maize", "beans"])
-
-
-
-print("---- Negative Prices ----")
-print(negative_prices)
-
-print("---- Duplicate IDs ----")
-print(duplicate_ids)
-
-print("---- Duplicate Rows ----")
-print(duplicate_rows)
-
-print("---- Invalid Dates ----")
-print(invalid_dates)
-
-print("---- Missing Markets ----")
-print(missing_market)
-
-print("---- Unknown Commodities ----")
-print(unknown_commodity)
+for name, rule_fn in rules:
+    failures = rule_fn(df)
+    print(f"---- {name} ----")
+    print(f"Count: {len(failures)}")
+    print(failures.head())
+    print()

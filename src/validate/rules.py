@@ -1,67 +1,79 @@
 import pandas as pd
-from datetime import datetime
+
+
+def _canonicalize_columns(df):
+    renamed = df.copy()
+    rename_map = {
+        "Id": "record_id",
+        "record_id": "record_id",
+        "date": "date",
+        "market": "market",
+        "markets": "market",
+        "commodity": "commodity",
+        "commodities": "commodity",
+        "comodities": "commodity",
+        "price": "price",
+    }
+    lower_map = {str(column).strip().lower(): str(column) for column in renamed.columns}
+    new_columns = []
+    for column in renamed.columns:
+        lower_name = str(column).strip().lower()
+        canonical = rename_map.get(column, rename_map.get(lower_name))
+        if canonical:
+            new_columns.append(canonical)
+        else:
+            new_columns.append(lower_name)
+    renamed.columns = new_columns
+    return renamed
+
 
 def rule_positive_price(df):
-    neg_prices = df[df["price"] < 0].copy()
-    neg_prices["Reason"]="Negative Price"
-    return neg_prices
-
-def rule_duplicate_ids(df):
-    # Create a mask for rows where the ID has appeared before
-    # keep='first' (default) marks the 2nd, 3rd, etc. occurrences as True
-    dup_mask = df["Id"].duplicated(keep="first")
-    
-    # Filter the dataframe to only keep those duplicate rows
-    dup_rows = df[dup_mask].copy()
-    
-    # Add the Reason column to match your framework's pattern
-    dup_rows["Reason"] = "Duplicate ID"
-    
-    return dup_rows
-
-def rule_duplicate_rows(df):
-    # Checks for entirely identical rows across all columns
-    # keep='first' flags the subsequent copies as duplicates
-    dup_row_mask = df.duplicated(keep="first")
-    
-    # Filter the dataframe to isolate the duplicate rows
-    dup_rows = df[dup_row_mask].copy()
-    
-    # Add the validation framework reason
-    dup_rows["Reason"] = "Duplicate Row"
-    
-    return dup_rows
-
-def rule_valid_date(df):
-    # convert date column to datetime objects; invalid formates turn to Not a Time(NaT)
-    converted_date = pd.to_datetime(df["date"], errors="coerce")
-
-    # find columns where conversion failed or time is in the future
-    invalid_mask = converted_date.isnull() | (converted_date > datetime.now())
-
-    # extract invalid rows, add reason
-    invalid_rows = df[invalid_mask].copy()
-    invalid_rows["Reason"] = "Invalid or Future date"
-
+    df_clean = _canonicalize_columns(df)
+    invalid_rows = df_clean[df_clean["price"] <= 0].copy()
+    invalid_rows["Reason"] = "Negative or non-positive price"
     return invalid_rows
 
+
+def rule_duplicate_ids(df):
+    df_clean = _canonicalize_columns(df)
+    duplicate_mask = df_clean["record_id"].duplicated(keep="first")
+    duplicate_rows = df_clean[duplicate_mask].copy()
+    duplicate_rows["Reason"] = "Duplicate ID"
+    return duplicate_rows
+
+
+def rule_duplicate_rows(df):
+    df_clean = _canonicalize_columns(df)
+    duplicate_mask = df_clean.duplicated(keep="first")
+    duplicate_rows = df_clean[duplicate_mask].copy()
+    duplicate_rows["Reason"] = "Duplicate Row"
+    return duplicate_rows
+
+
+def rule_valid_date(df):
+    df_clean = _canonicalize_columns(df)
+    converted_date = pd.to_datetime(df_clean["date"], errors="coerce")
+    invalid_mask = converted_date.isnull() | (converted_date > pd.Timestamp.now())
+    invalid_rows = df_clean[invalid_mask].copy()
+    invalid_rows["Reason"] = "Invalid or future date"
+    return invalid_rows
+
+
 def rule_missing_market(df):
-    # find rows where market name is null
-    missing_mark = (df["markets"].isnull()) | (df["markets"] == "")
-
-    # extract rows, columns
-    missing_rows = df[missing_mark].copy()
+    df_clean = _canonicalize_columns(df)
+    missing_mask = df_clean["market"].isna() | df_clean["market"].astype(str).str.strip().eq("")
+    missing_rows = df_clean[missing_mask].copy()
     missing_rows["Reason"] = "Missing market"
-
     return missing_rows
 
-def rule_known_commodity(df, known_commodity):
-    # find rows where commodity is not in the known list
-    known_values = {commodity.lower() for commodity in known_commodity}
-    unknown_mask = ~df["Comodities"].fillna("").str.lower().isin(known_values)
 
-    # extract rows, add reason
-    unknown_row = df[unknown_mask].copy()
-    unknown_row["Reason"] = "Unknown Commodity"
-
-    return unknown_row
+def rule_known_commodity(df, known_commodities=None):
+    df_clean = _canonicalize_columns(df)
+    if known_commodities is None:
+        known_commodities = ["Maize", "Beans"]
+    known_values = {str(item).strip().lower() for item in known_commodities}
+    commodity_values = df_clean["commodity"].fillna("").astype(str).str.strip().str.lower()
+    unknown_mask = ~commodity_values.isin(known_values)
+    unknown_rows = df_clean[unknown_mask].copy()
+    unknown_rows["Reason"] = "Unknown commodity"
+    return unknown_rows
