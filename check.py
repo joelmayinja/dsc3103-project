@@ -10,6 +10,8 @@ from src.validate.rules import (
 )
 
 
+from src.ingest.source_a import ingest_source_a #We are in check .py and we are importing the ingest_source_a function from source_a.py to use it here. This is done to avoid hard coding the path to the source data in multiple places, making the code more maintainable and flexible.
+
 df = pd.read_csv("data/raw/prices.csv")
 
 rules = [
@@ -27,3 +29,8 @@ for name, rule_fn in rules:
     print(f"Count: {len(failures)}")
     print(failures.head())
     print()
+
+
+source_a = ingest_source_a()
+print("---- Source A shape ----")
+print(source_a.shape)
