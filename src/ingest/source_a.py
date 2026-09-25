@@ -1,10 +1,11 @@
-#%%
 import pandas as pd
-from src.common.config import SOURCE_A_RAW_PATH  #Here we are importing it from the config file, so that if changes are made to the source path, we can change it in one place and it will be reflected throughout the code.
+from pathlib import Path
 
-def ingest_source_a(path =SOURCE_A_RAW_PATH):
-    df = pd.read_csv(path)
-    return df
-# %%
-## this is what we call hard coding above, we can make it more flexible by passing the path as an argument to the function.
-#This is done better by storing a source path so that if chsanges are made to the source path, we can change it in one place and it will be reflected throughout the code.
+from src.common.config import SOURCE_A_RAW_PATH
+
+
+def ingest_source_a(path: str | Path = SOURCE_A_RAW_PATH) -> pd.DataFrame:
+    source_path = Path(path)
+    if not source_path.is_file():
+        raise FileNotFoundError(f"Source A file was not found: {source_path}")
+    return pd.read_csv(source_path)
