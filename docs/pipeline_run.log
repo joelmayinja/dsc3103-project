@@ -1,0 +1,54 @@
+2026-09-25 12:02:12 | INFO | logging setup works
+2026-09-25 12:59:51 | INFO | === Pipeline run started ===
+2026-09-25 12:59:51 | INFO | Stage 1: ingesting source A
+2026-09-25 12:59:51 | INFO | Source A ingested rows=1010
+2026-09-25 12:59:51 | INFO | Stage 2: ingesting source B
+2026-09-25 12:59:52 | INFO | Source B ingested rows=728
+2026-09-25 12:59:52 | INFO | Stage 3: cleaning data
+2026-09-25 12:59:52 | INFO | Source A cleaned rows_in=1010 rows_out=918 decisions=6
+2026-09-25 12:59:52 | INFO | Stage 4: merging prices and rainfall
+2026-09-25 12:59:52 | INFO | Merge complete rows=918
+2026-09-25 13:01:03 | INFO | === Pipeline run started ===
+2026-09-25 13:01:03 | INFO | Stage 1: ingesting source A
+2026-09-25 13:01:03 | INFO | Source A ingested rows=1010
+2026-09-25 13:01:03 | INFO | Stage 2: ingesting source B
+2026-09-25 13:01:03 | INFO | Source B ingested rows=728
+2026-09-25 13:01:03 | INFO | Stage 3: cleaning data
+2026-09-25 13:01:03 | INFO | Source A cleaned rows_in=1010 rows_out=918 decisions=6
+2026-09-25 13:01:03 | INFO | Stage 4: merging prices and rainfall
+2026-09-25 13:01:03 | INFO | Merge complete rows=918
+2026-09-25 13:09:12 | INFO | === Pipeline run started ===
+2026-09-25 13:09:12 | INFO | Stage 1: ingesting source A
+2026-09-25 13:09:12 | INFO | Source A ingested rows=1010
+2026-09-25 13:09:12 | INFO | Stage 2: ingesting source B
+2026-09-25 13:09:12 | INFO | Source B ingested rows=728
+2026-09-25 13:09:12 | INFO | Stage 3: cleaning data
+2026-09-25 13:09:12 | INFO | Source A cleaned rows_in=1010 rows_out=918 decisions=6
+2026-09-25 13:09:12 | INFO | Stage 4: merging prices and rainfall
+2026-09-25 13:09:12 | INFO | Merge complete rows=918
+2026-09-25 13:09:12 | INFO | Stage 5:Saving the merged file
+2026-09-25 13:09:12 | INFO | Stagge 55: Saving complete:saved918rows
+2026-09-25 13:10:36 | INFO | === Pipeline run started ===
+2026-09-25 13:10:36 | INFO | Stage 1: ingesting source A
+2026-09-25 13:10:36 | INFO | Source A ingested rows=1010
+2026-09-25 13:10:36 | INFO | Stage 2: ingesting source B
+2026-09-25 13:10:36 | INFO | Source B ingested rows=728
+2026-09-25 13:10:36 | INFO | Stage 3: cleaning data
+2026-09-25 13:10:37 | INFO | Source A cleaned rows_in=1010 rows_out=918 decisions=6
+2026-09-25 13:10:37 | INFO | Stage 4: merging prices and rainfall
+2026-09-25 13:10:37 | INFO | Merge complete rows=918
+2026-09-25 13:10:37 | INFO | Stage 5:Saving the merged file
+2026-09-25 13:10:37 | INFO | Stagge 55: Saving complete:saved918rows
+2026-09-25 13:10:37 | INFO | === Pipeline run completed===
+2026-09-25 13:23:42 | INFO | === Pipeline run started ===
+2026-09-25 13:23:42 | INFO | Stage 1: ingesting source A
+2026-09-25 13:23:42 | INFO | Source A ingested rows=1010
+2026-09-25 13:23:42 | INFO | Stage 2: ingesting source B
+2026-09-25 13:23:42 | INFO | Source B ingested rows=728
+2026-09-25 13:23:42 | INFO | Stage 3: cleaning data
+2026-09-25 13:23:43 | INFO | Source A cleaned rows_in=1010 rows_out=918 decisions=6
+2026-09-25 13:23:43 | INFO | Stage 4: merging prices and rainfall
+2026-09-25 13:23:43 | INFO | Merge complete rows=918
+2026-09-25 13:23:43 | INFO | Stage 5:Saving the merged file
+2026-09-25 13:23:43 | INFO | Stagge 55: Saving complete:saved918rows
+2026-09-25 13:23:43 | INFO | === Pipeline run completed===
