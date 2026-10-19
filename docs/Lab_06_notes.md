@@ -1,0 +1,1 @@
+owino market has 70%
